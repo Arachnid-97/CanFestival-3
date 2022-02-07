@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <linux/timers.h>
 #include <linux/errno.h>
 
-#include "timers.h"
+#include "timer_s.h"
 #include "applicfg.h"
 
 static spinlock_t lock = SPIN_LOCK_UNLOCKED;

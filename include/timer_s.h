@@ -1,4 +1,18 @@
 /*
+ ******************************************************************************
+ * @file    timer_s.h
+ * @author  Edouard TISSERANT and Francis DUPIN
+ * @brief   View the original comments of the file
+ *
+ * @note    This file was modified by Arachnid-97, it's
+ *          original name was timers.c
+ *          Update: Rename timers.h into timer_s.h to avoid clash 
+ *          with FreeRTOS includes
+ *
+ ******************************************************************************
+ */
+
+/*
 This file is part of CanFestival, a library implementing CanOpen Stack.
 
 Copyright (C): Edouard TISSERANT and Francis DUPIN
@@ -20,8 +34,8 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifndef __timers_h__
-#define __timers_h__
+#ifndef __timer_s_h__
+#define __timer_s_h__
 
 #include <timerscfg.h>
 #include <applicfg.h>
@@ -89,4 +103,4 @@ void setTimer(TIMEVAL value);
  */
 TIMEVAL getElapsedTime(void);
 
-#endif /* #define __timers_h__ */
+#endif /* #define __timer_s_h__ */

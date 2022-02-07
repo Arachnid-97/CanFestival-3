@@ -31,7 +31,7 @@ extern "C" {
 
 #include "applicfg.h"
 #include "can_driver.h"
-#include "timers.h"
+#include "timer_s.h"
 #include "timers_driver.h"
 
 #ifdef __cplusplus

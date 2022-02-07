@@ -62,6 +62,7 @@ UNS8 GetSDOClientFromNodeId( CO_Data* d, UNS8 nodeId );
  ** @param data
  ** @param Callback
  ** @param endianize
+ ** @param useBlockMode
  **
  ** @return
  **/
@@ -77,6 +78,7 @@ INLINE UNS8 _writeNetworkDict (CO_Data* d, UNS8 nodeId, UNS16 index,
  ** @param subIndex
  ** @param dataType
  ** @param Callback
+ ** @param useBlockMode
  **
  ** @return
  **/
@@ -585,7 +587,7 @@ UNS8 getSDOlineToClose (CO_Data* d, UNS8 CliServNbr, UNS8 whoami, UNS8 *line)
  **
  **
  ** @param d
- ** @param CliServNbr
+ ** @param nodeId
  ** @param whoami
  **
  ** @return
@@ -706,6 +708,7 @@ UNS8 sendSDO (CO_Data* d, UNS8 whoami, UNS8 CliServNbr, UNS8 *pData)
  **
  ** @param d
  ** @param whoami
+ ** @param CliServNbr
  ** @param index
  ** @param subIndex
  ** @param abortCode
@@ -749,12 +752,12 @@ UNS8 proceedSDO (CO_Data* d, Message *m)
 	UNS8 line;
 	UNS32 nbBytes; 		/* received or to be transmited. */
 	UNS8 nodeId = 0;  	/* The node Id of the server if client otherwise unused */
-	UNS8 CliServNbr;
+	UNS8 CliServNbr = 0;	/* Prevent uninitialized use of warnings */
 	UNS8 whoami = SDO_UNKNOWN;  /* SDO_SERVER or SDO_CLIENT.*/
 	UNS32 errorCode; /* while reading or writing in the local object dictionary.*/
 	UNS8 data[8];    /* data for SDO to transmit */
-	UNS16 index;
-	UNS8 subIndex;
+	UNS16 index = 0;	/* Prevent uninitialized use of warnings */
+	UNS8 subIndex = 0;	/* Prevent uninitialized use of warnings */
 	UNS32 abortCode;
 	UNS32 i;
 	UNS8	j;
@@ -840,8 +843,8 @@ UNS8 proceedSDO (CO_Data* d, Message *m)
 	cs = 0xFF; 
 	/* Special cases for block transfer : in frames with segment data cs is not spécified */
    	if (!err) {
-		if ((whoami == SDO_SERVER) && (d->transfers[line].state == SDO_BLOCK_DOWNLOAD_IN_PROGRESS) ||
-			(whoami == SDO_CLIENT) && (d->transfers[line].state == SDO_BLOCK_UPLOAD_IN_PROGRESS)) {		
+		if (((whoami == SDO_SERVER) && (d->transfers[line].state == SDO_BLOCK_DOWNLOAD_IN_PROGRESS)) ||
+			((whoami == SDO_CLIENT) && (d->transfers[line].state == SDO_BLOCK_UPLOAD_IN_PROGRESS))) {		
 			if(m->data[0] == 0x80)	/* If first byte is 0x80 it is an abort frame (seqno = 0 not allowed) */
 				cs = 4;
 			else
@@ -1862,12 +1865,14 @@ UNS8 GetSDOClientFromNodeId( CO_Data* d, UNS8 nodeId )
  ** @param data
  ** @param Callback
  ** @param endianize
+ ** @param useBlockMode
  **
  ** @return
  **/
 INLINE UNS8 _writeNetworkDict (CO_Data* d, UNS8 nodeId, UNS16 index,
 		UNS8 subIndex, UNS32 count, UNS8 dataType, void *data, SDOCallback_t Callback, UNS8 endianize, UNS8 useBlockMode)
 {
+	(void)endianize;
 	UNS8 err;
 	UNS8 line;
 	UNS8 CliNbr;
@@ -2030,7 +2035,6 @@ UNS8 writeNetworkDictCallBackAI (CO_Data* d, UNS8 nodeId, UNS16 index,
 	UNS16 lastIndex;
 	UNS16 offset;
 	UNS8 nodeIdServer;
-	UNS8 i;
 
 	ret = _writeNetworkDict (d, nodeId, index, subIndex, count, dataType, data, Callback, endianize, useBlockMode);
 	if(ret == 0xFE)
@@ -2042,7 +2046,7 @@ UNS8 writeNetworkDictCallBackAI (CO_Data* d, UNS8 nodeId, UNS16 index,
 			MSG_ERR(0x1AC6, "writeNetworkDict : No SDO client index found", 0);
 			return 0xFF;
 		}
-		i = 0;
+
 		while (offset <= lastIndex)
 		{
 			if (d->objdict[offset].bSubCount <= 3)
@@ -2192,7 +2196,6 @@ UNS8 readNetworkDictCallbackAI (CO_Data* d, UNS8 nodeId, UNS16 index, UNS8 subIn
 	UNS16 lastIndex;
 	UNS16 offset;
 	UNS8 nodeIdServer;
-	UNS8 i;
 
 	ret = _readNetworkDict (d, nodeId, index, subIndex, dataType, Callback, useBlockMode);
 	if(ret == 0xFE)
@@ -2204,7 +2207,7 @@ UNS8 readNetworkDictCallbackAI (CO_Data* d, UNS8 nodeId, UNS16 index, UNS8 subIn
 			MSG_ERR(0x1AC6, "writeNetworkDict : No SDO client index found", 0);
 			return 0xFF;
 		}
-		i = 0;
+
 		while (offset <= lastIndex)
 		{
 			if (d->objdict[offset].bSubCount <= 3)

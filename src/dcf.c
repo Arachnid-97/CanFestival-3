@@ -63,10 +63,14 @@ inline void start_node(CO_Data* d, UNS8 nodeId){
 }
 
 /**
-** @brief Function to be called from post_SlaveBootup
-**
-** @param d
-** @param nodeId
+* @brief Function to be called from post_SlaveBootup
+* for starting the configuration manager
+*
+* @param *d Pointer on a CAN object data structure
+* @param nodeId Id of the slave node
+* @return 0: configuration manager busy
+*         1: nothing to check, node started
+*         2: dcf check started
 */
 UNS8 check_and_start_node(CO_Data* d, UNS8 nodeId)
 {   
@@ -80,7 +84,13 @@ UNS8 check_and_start_node(CO_Data* d, UNS8 nodeId)
     return 2;
 }
 
-inline void start_and_seek_node(CO_Data* d, UNS8 nodeId){
+/**
+** @brief Start the nodeId slave and look for other nodes waiting to be started 
+**        If nodeId is 0 the start node is not done
+** @param d
+** @param nodeId
+*/
+void start_and_seek_node(CO_Data* d, UNS8 nodeId){
    UNS8 node;
    start_node(d,nodeId);
    /* Look for other nodes waiting to be started */
@@ -103,7 +113,7 @@ inline void start_and_seek_node(CO_Data* d, UNS8 nodeId){
 static void CheckSDOAndContinue(CO_Data* d, UNS8 nodeId)
 {
     UNS32 abortCode = 0;
-    UNS8 buf[4], match = 0, node;
+    UNS8 buf[4], match = 0;
     UNS32 size=4;
     if(d->dcf_status == DCF_STATUS_READ_CHECK){
         // printf("DCF_STATUS_READ_CHECK \n");
@@ -157,12 +167,12 @@ dcferror:
 }
 
 /**
-**
-**
-** @param d
-** @param nodeId
-**
-** @return
+* @brief Init the consise dcf in CO_Data for nodeId
+*
+* @param *d Pointer on a CAN object data structure
+* @param nodeId Id of the slave node
+* @return 1: dcf check started
+*         0: nothing to do
 */
 UNS8 init_consise_dcf(CO_Data* d,UNS8 nodeId)
 {
